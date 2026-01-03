@@ -5,12 +5,14 @@
     {"src": "api/*.js", "use": "@vercel/node"},
     {"src": "*.css", "use": "@vercel/static"},
     {"src": "*.js", "use": "@vercel/static"},
-    {"src": "images/**", "use": "@vercel/static"}
+    {"src": "images/*", "use": "@vercel/static"}
   ],
   "routes": [
-    {"src": "/api/(.*)", "dest": "/api/$1"},
-    {"src": "/(.*)", "dest": "/index.html"}
-  ],
+  {"src": "/api/(.*)", "dest": "/api/$1"},
+  {"src": "/images/(.*)", "dest": "/images/$1"},
+  {"src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico))", "dest": "/$1"},
+  {"src": "/(.*)", "dest": "/index.html"}
+],
   "env": {
     "MONGODB_URI": "mongodb+srv://udaysharma1412_db_user:Uu7878282655@cluster0.kvab4cu.mongodb.net/krazy-girls",
     "JWT_SECRET": "krazy-girls-jwt-secret-2024-secure-key",
