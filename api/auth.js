@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../backend/models/User');
+const User = require('../../models/User');
 
 // Load environment variables
 require('dotenv').config();
