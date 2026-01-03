@@ -27,17 +27,17 @@
   },
   "functions": {
     "api/signup.js": {
-      "runtime": "nodejs18.x",
+      "runtime": "nodejs24.x",
       "memory": 1024,
       "maxDuration": 30
     },
     "api/login.js": {
-      "runtime": "nodejs18.x",
+      "runtime": "nodejs24.x",
       "memory": 1024,
       "maxDuration": 30
     },
     "api/auth.js": {
-      "runtime": "nodejs18.x",
+      "runtime": "nodejs24.x",
       "memory": 1024,
       "maxDuration": 30
     }

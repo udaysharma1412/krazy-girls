@@ -23,7 +23,7 @@
     "vercel": "^28.4.8"
   },
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "keywords": ["ecommerce", "shopping", "krazy-girls"],
   "author": "Krazy Girls Team",
