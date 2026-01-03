@@ -7,8 +7,8 @@ class ApiClient {
     this.isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
     
     if (this.isProduction) {
-      this.baseURL = 'https://your-vercel-app.vercel.app/api';
-      this.userBaseURL = 'https://your-vercel-app.vercel.app/api';
+      this.baseURL = 'https://krazy-girls.vercel.app/api';
+      this.userBaseURL = 'https://krazy-girls.vercel.app/api';
     } else {
       this.baseURL = 'http://localhost:5004/api';
       this.userBaseURL = 'http://localhost:5003/api';
