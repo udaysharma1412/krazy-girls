@@ -1,1 +1,0 @@
-Force Vercel to use Node.js 24.x
