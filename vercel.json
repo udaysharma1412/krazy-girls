@@ -24,5 +24,22 @@
     "EMAIL_USER": "@email_user",
     "EMAIL_PASS": "@email_pass",
     "JWT_EXPIRE": "@jwt_expire"
+  },
+  "functions": {
+    "api/signup.js": {
+      "runtime": "nodejs18.x",
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/login.js": {
+      "runtime": "nodejs18.x",
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/auth.js": {
+      "runtime": "nodejs18.x",
+      "memory": 1024,
+      "maxDuration": 30
+    }
   }
 }
