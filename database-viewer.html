@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Krazy Girls - Database Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .data { background: #f5f5f5; padding: 10px; white-space: pre-wrap; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .export { background: #4CAF50; color: white; }
+        .import { background: #2196F3; color: white; }
+        .clear { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🗄️ Krazy Girls Database Viewer</h1>
+    
+    <div class="section">
+        <h2>📦 Products Database</h2>
+        <div id="products" class="data">Loading...</div>
+        <button onclick="viewData('products')">Refresh</button>
+    </div>
+    
+    <div class="section">
+        <h2>🛒 Cart Database</h2>
+        <div id="cart" class="data">Loading...</div>
+        <button onclick="viewData('cart')">Refresh</button>
+    </div>
+    
+    <div class="section">
+        <h2>❤️ Wishlist Database</h2>
+        <div id="wishlist" class="data">Loading...</div>
+        <button onclick="viewData('wishlist')">Refresh</button>
+    </div>
+    
+    <div class="section">
+        <h2>👥 Users Database</h2>
+        <div id="users" class="data">Loading...</div>
+        <button onclick="viewData('users')">Refresh</button>
+    </div>
+    
+    <div class="section">
+        <h2>🔧 Database Tools</h2>
+        <button class="export" onclick="exportData()">📥 Export All Data</button>
+        <button class="import" onclick="importData()">📤 Import Data</button>
+        <button class="clear" onclick="clearAllData()">🗑️ Clear All Data</button>
+    </div>
+
+    <script>
+        function viewData(type) {
+            const data = localStorage.getItem(type);
+            const element = document.getElementById(type);
+            
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    element.textContent = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    element.textContent = data;
+                }
+            } else {
+                element.textContent = 'No data found';
+            }
+        }
+        
+        function exportData() {
+            const data = {
+                products: localStorage.getItem('products'),
+                cart: localStorage.getItem('cart'),
+                wishlist: localStorage.getItem('wishlist'),
+                users: localStorage.getItem('users')
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'krazy-girls-database.json';
+            a.click();
+        }
+        
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        if (data.products) localStorage.setItem('products', data.products);
+                        if (data.cart) localStorage.setItem('cart', data.cart);
+                        if (data.wishlist) localStorage.setItem('wishlist', data.wishlist);
+                        if (data.users) localStorage.setItem('users', data.users);
+                        
+                        alert('Data imported successfully!');
+                        viewData('products');
+                        viewData('cart');
+                        viewData('wishlist');
+                        viewData('users');
+                    } catch (e) {
+                        alert('Error importing data: ' + e.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear ALL data? This cannot be undone!')) {
+                localStorage.removeItem('products');
+                localStorage.removeItem('cart');
+                localStorage.removeItem('wishlist');
+                localStorage.removeItem('users');
+                alert('All data cleared!');
+                viewData('products');
+                viewData('cart');
+                viewData('wishlist');
+                viewData('users');
+            }
+        }
+        
+        // Load data on page load
+        viewData('products');
+        viewData('cart');
+        viewData('wishlist');
+        viewData('users');
+    </script>
+</body>
+</html>

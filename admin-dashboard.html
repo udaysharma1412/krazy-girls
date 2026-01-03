@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krazy Girls - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .data-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .data-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .data-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .data-item strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .data-item span {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 20px 0;
+            transition: background 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #5a67d8;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🛍️ Krazy Girls Admin Dashboard</h1>
+            <p>Manage your e-commerce store</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalCarts">0</div>
+                <div class="stat-label">Active Carts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalWishlists">0</div>
+                <div class="stat-label">Wishlists</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalOrders">0</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('users')">Users</button>
+                <button class="tab" onclick="showTab('carts')">Carts</button>
+                <button class="tab" onclick="showTab('wishlists')">Wishlists</button>
+                <button class="tab" onclick="showTab('local-storage')">Local Storage</button>
+            </div>
+            
+            <div id="users-tab" class="tab-content active">
+                <div class="section-title">👥 Registered Users</div>
+                <div id="users-data" class="data-grid">
+                    <div class="empty-state">
+                        <h3>No users found</h3>
+                        <p>Users will appear here when they register</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="carts-tab" class="tab-content">
+                <div class="section-title">🛒 Shopping Carts</div>
+                <div id="carts-data" class="data-grid">
+                    <div class="empty-state">
+                        <h3>No carts found</h3>
+                        <p>Carts will appear here when users add items</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="wishlists-tab" class="tab-content">
+                <div class="section-title">❤️ Wishlists</div>
+                <div id="wishlists-data" class="data-grid">
+                    <div class="empty-state">
+                        <h3>No wishlists found</h3>
+                        <p>Wishlists will appear here when users add items</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="local-storage-tab" class="tab-content">
+                <div class="section-title">💾 Browser Local Storage</div>
+                <div id="local-storage-data" class="data-grid">
+                    <div class="empty-state">
+                        <h3>Loading local storage data...</h3>
+                        <p>This shows data stored in the browser</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+    </div>
+
+    <script>
+        // API endpoint
+        const API_BASE = 'http://localhost:5001/api';
+        
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data for the tab
+            if (tabName === 'local-storage') {
+                loadLocalStorageData();
+            } else {
+                loadTabData(tabName);
+            }
+        }
+        
+        // Load data from API
+        async function loadTabData(tabName) {
+            try {
+                const response = await fetch(`${API_BASE}/${tabName}`);
+                const data = await response.json();
+                
+                if (tabName === 'users') {
+                    displayUsers(data);
+                } else if (tabName === 'carts') {
+                    displayCarts(data);
+                } else if (tabName === 'wishlists') {
+                    displayWishlists(data);
+                }
+            } catch (error) {
+                console.error(`Error loading ${tabName}:`, error);
+                document.getElementById(tabName + '-data').innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error loading data</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Display users
+        function displayUsers(users) {
+            const container = document.getElementById('users-data');
+            document.getElementById('totalUsers').textContent = users.length;
+            
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No users found</h3>
+                        <p>Users will appear here when they register</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = users.map(user => `
+                <div class="data-item">
+                    <strong>${user.name}</strong>
+                    <span>Email: ${user.email}</span>
+                    <span>Phone: ${user.phone}</span>
+                    <span>Joined: ${new Date(user.createdAt).toLocaleDateString()}</span>
+                    <span>ID: ${user._id}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Display carts
+        function displayCarts(carts) {
+            const container = document.getElementById('carts-data');
+            document.getElementById('totalCarts').textContent = carts.length;
+            
+            if (carts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No carts found</h3>
+                        <p>Carts will appear here when users add items</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = carts.map(cart => `
+                <div class="data-item">
+                    <strong>Cart for ${cart.userId || 'Guest'}</strong>
+                    <span>Items: ${cart.items ? cart.items.length : 0}</span>
+                    <span>Total: ₹${cart.total || 0}</span>
+                    <span>Updated: ${new Date(cart.updatedAt).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Display wishlists
+        function displayWishlists(wishlists) {
+            const container = document.getElementById('wishlists-data');
+            document.getElementById('totalWishlists').textContent = wishlists.length;
+            
+            if (wishlists.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No wishlists found</h3>
+                        <p>Wishlists will appear here when users add items</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = wishlists.map(wishlist => `
+                <div class="data-item">
+                    <strong>Wishlist for ${wishlist.userId || 'Guest'}</strong>
+                    <span>Items: ${wishlist.items ? wishlist.items.length : 0}</span>
+                    <span>Updated: ${new Date(wishlist.updatedAt).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Load local storage data
+        function loadLocalStorageData() {
+            const container = document.getElementById('local-storage-data');
+            
+            const data = {
+                cart: localStorage.getItem('cart'),
+                wishlist: localStorage.getItem('wishlist'),
+                products: localStorage.getItem('products'),
+                currentUser: localStorage.getItem('currentUser')
+            };
+            
+            container.innerHTML = Object.entries(data).map(([key, value]) => {
+                const parsed = value ? JSON.parse(value) : null;
+                const count = parsed ? (Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length) : 0;
+                
+                return `
+                    <div class="data-item">
+                        <strong>${key.toUpperCase()}</strong>
+                        <span>Items: ${count}</span>
+                        <span>Size: ${value ? value.length : 0} characters</span>
+                        <span>Last updated: ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Refresh all data
+        function refreshData() {
+            loadTabData('users');
+            loadTabData('carts');
+            loadTabData('wishlists');
+            loadLocalStorageData();
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+        });
+    </script>
+</body>
+</html>

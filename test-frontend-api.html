@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Frontend API Connection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { background: #d4edda; color: #155724; padding: 10px; margin: 5px 0; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; margin: 5px 0; }
+        .warning { background: #fff3cd; color: #856404; padding: 10px; margin: 5px 0; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Frontend API Connection</h1>
+    
+    <div class="test-section">
+        <h2>📡 API Connection Test</h2>
+        <div id="apiStatus"></div>
+        <button onclick="testAPIConnection()">Test API Connection</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>👥 User Registration Test</h2>
+        <div id="registrationTest"></div>
+        <button onclick="testRegistration()">Test Registration</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔍 Debug Info</h2>
+        <div id="debugInfo"></div>
+        <button onclick="showDebugInfo()">Show Debug Info</button>
+    </div>
+
+    <script src="backend/api-client.js"></script>
+    <script>
+        // Initialize API client
+        const api = new ApiClient();
+        
+        function testAPIConnection() {
+            const statusDiv = document.getElementById('apiStatus');
+            statusDiv.innerHTML = '<p>Testing API connection...</p>';
+            
+            // Test user server
+            fetch('http://localhost:5003/api/users')
+                .then(response => {
+                    if (response.ok) {
+                        statusDiv.innerHTML += '<div class="success">✅ User Server (5003) - Connected</div>';
+                    } else {
+                        statusDiv.innerHTML += '<div class="error">❌ User Server (5003) - Failed: ' + response.status + '</div>';
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    statusDiv.innerHTML += '<p>Users in MongoDB: ' + (data.count || 0) + '</p>';
+                })
+                .catch(error => {
+                    statusDiv.innerHTML += '<div class="error">❌ User Server Error: ' + error.message + '</div>';
+                });
+            
+            // Test product server
+            fetch('http://localhost:5004/api/products')
+                .then(response => {
+                    if (response.ok) {
+                        statusDiv.innerHTML += '<div class="success">✅ Product Server (5004) - Connected</div>';
+                    } else {
+                        statusDiv.innerHTML += '<div class="error">❌ Product Server (5004) - Failed: ' + response.status + '</div>';
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    statusDiv.innerHTML += '<p>Products available: ' + (data.products ? data.products.length : 0) + '</p>';
+                })
+                .catch(error => {
+                    statusDiv.innerHTML += '<div class="error">❌ Product Server Error: ' + error.message + '</div>';
+                });
+        }
+        
+        async function testRegistration() {
+            const testDiv = document.getElementById('registrationTest');
+            testDiv.innerHTML = '<p>Testing registration...</p>';
+            
+            const testUser = {
+                name: 'Frontend Test User',
+                email: 'frontend.test@example.com',
+                phone: '9998887775',
+                password: 'frontend123'
+            };
+            
+            try {
+                // Test using API client
+                if (window.api && api.signup) {
+                    const result = await api.signup(testUser);
+                    
+                    if (result.success) {
+                        testDiv.innerHTML += '<div class="success">✅ Registration successful via API client!</div>';
+                        testDiv.innerHTML += '<p>User ID: ' + result.user._id + '</p>';
+                        testDiv.innerHTML += '<p>Welcome Email Sent: ' + (result.user.welcomeEmailSent || 'Unknown') + '</p>';
+                    } else {
+                        testDiv.innerHTML += '<div class="error">❌ Registration failed: ' + result.message + '</div>';
+                    }
+                } else {
+                    testDiv.innerHTML += '<div class="error">❌ API client not available (window.api is undefined)</div>';
+                }
+                
+                // Also test direct fetch
+                const response = await fetch('http://localhost:5003/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testUser)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    testDiv.innerHTML += '<div class="success">✅ Registration successful via direct fetch!</div>';
+                } else {
+                    testDiv.innerHTML += '<div class="warning">⚠️ Direct fetch failed: ' + result.message + '</div>';
+                }
+                
+            } catch (error) {
+                testDiv.innerHTML += '<div class="error">❌ Registration test error: ' + error.message + '</div>';
+            }
+        }
+        
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debugInfo');
+            
+            let html = '<h3>🔍 Debug Information:</h3>';
+            html += '<p><strong>window.api:</strong> ' + (window.api ? 'Available ✅' : 'Not available ❌') + '</p>';
+            html += '<p><strong>ApiClient:</strong> ' + (typeof ApiClient !== 'undefined' ? 'Available ✅' : 'Not available ❌') + '</p>';
+            html += '<p><strong>Current URL:</strong> ' + window.location.href + '</p>';
+            html += '<p><strong>User Agent:</strong> ' + navigator.userAgent + '</p>';
+            
+            if (window.api) {
+                html += '<p><strong>API Base URL:</strong> ' + api.baseURL + '</p>';
+                html += '<p><strong>API User Base URL:</strong> ' + api.userBaseURL + '</p>';
+            }
+            
+            debugDiv.innerHTML = html;
+        }
+        
+        // Auto-run tests on load
+        window.onload = function() {
+            showDebugInfo();
+        };
+    </script>
+</body>
+</html>

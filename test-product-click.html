@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Click Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 10px;
+            cursor: pointer;
+            background: white;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            color: #e74c3c;
+            font-size: 16px;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Click Test</h1>
+    
+    <div class="debug-info">
+        <h3>Debug Information:</h3>
+        <div id="debug-output">Click on a product to see debug info...</div>
+    </div>
+    
+    <div id="products-container">
+        <!-- Products will be loaded here -->
+    </div>
+
+    <script>
+        // Sample products for testing
+        const testProducts = [
+            {
+                id: "test-1",
+                _id: "test-1",
+                name: "Test Product 1",
+                price: 999,
+                description: "This is a test product"
+            },
+            {
+                id: "test-2", 
+                _id: "test-2",
+                name: "Test Product 2",
+                price: 1299,
+                description: "This is another test product"
+            }
+        ];
+
+        function showProductDetail(productId) {
+            console.log('showProductDetail called with productId:', productId);
+            
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.innerHTML = `
+                <strong>Product ID clicked:</strong> ${productId}<br>
+                <strong>Available products:</strong> ${JSON.stringify(testProducts, null, 2)}<br>
+                <strong>Looking for product...</strong><br>
+            `;
+            
+            // Try both id and _id fields
+            const product = testProducts.find(p => p.id === productId || p._id === productId);
+            
+            if (product) {
+                debugOutput.innerHTML += `
+                    <strong style="color: green;">✅ Product found!</strong><br>
+                    <strong>Name:</strong> ${product.name}<br>
+                    <strong>Price:</strong> ${product.price}<br>
+                    <strong>Description:</strong> ${product.description}
+                `;
+                alert(`Product Details:\n\nName: ${product.name}\nPrice: ${product.price}\nDescription: ${product.description}`);
+            } else {
+                debugOutput.innerHTML += `<strong style="color: red;">❌ Product not found!</strong>`;
+                alert('Product not found!');
+            }
+        }
+
+        // Load products
+        function loadProducts() {
+            const container = document.getElementById('products-container');
+            container.innerHTML = testProducts.map(product => `
+                <div class="product-card" onclick="showProductDetail('${product.id}')" data-product-id="${product.id}">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">₹${product.price}</div>
+                    <div>ID: ${product.id} / _id: ${product._id}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        loadProducts();
+    </script>
+</body>
+</html>

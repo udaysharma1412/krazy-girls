@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { background: #d4edda; color: #155724; padding: 10px; margin: 5px 0; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; margin: 5px 0; }
+        .warning { background: #fff3cd; color: #856404; padding: 10px; margin: 5px 0; }
+        .info { background: #d1ecf1; color: #0c5460; padding: 10px; margin: 5px 0; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Registration Process</h1>
+    
+    <div class="debug-section">
+        <h2>📡 API Connection Test</h2>
+        <div id="apiStatus"></div>
+        <button onclick="testAPIConnection()">Test API Connection</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>👥 Registration Form</h2>
+        <form id="registrationForm" onsubmit="testRegistration(event)">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required value="Debug Test User">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required value="unique.user.2026.999@example.com">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" required value="9998887775">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required value="debug123">
+            </div>
+            <button type="submit">Register User</button>
+        </form>
+    </div>
+    
+    <div class="debug-section">
+        <h2>📊 Registration Results</h2>
+        <div id="registrationResults"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🔍 Debug Information</h2>
+        <div id="debugInfo"></div>
+        <button onclick="showDebugInfo()">Show Debug Info</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🗄️ MongoDB Users</h2>
+        <div id="mongoUsers">
+            <button onclick="checkMongoUsers()">Check MongoDB Users</button>
+        </div>
+    </div>
+
+    <script src="backend/api-client.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        // Initialize API client
+        window.api = new ApiClient();
+        
+        // Use existing auth instance or create new one
+        let authInstance;
+        if (typeof auth !== 'undefined') {
+            authInstance = auth;
+        } else {
+            authInstance = new Auth();
+        }
+        
+        // Make functions global
+        window.testAPIConnection = testAPIConnection;
+        window.testRegistration = testRegistration;
+        window.showDebugInfo = showDebugInfo;
+        window.checkMongoUsers = checkMongoUsers;
+        
+        function testAPIConnection() {
+            const statusDiv = document.getElementById('apiStatus');
+            statusDiv.innerHTML = '<p>Testing API connection...</p>';
+            
+            // Test user server
+            fetch('http://localhost:5003/api/users')
+                .then(response => {
+                    if (response.ok) {
+                        statusDiv.innerHTML += '<div class="success">✅ User Server (5003) - Connected</div>';
+                    } else {
+                        statusDiv.innerHTML += '<div class="error">❌ User Server (5003) - Failed: ' + response.status + '</div>';
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    statusDiv.innerHTML += '<p>Users in MongoDB: ' + (data.count || 0) + '</p>';
+                })
+                .catch(error => {
+                    statusDiv.innerHTML += '<div class="error">❌ User Server Error: ' + error.message + '</div>';
+                });
+        }
+        
+        async function testRegistration(event) {
+            event.preventDefault();
+            
+            const resultsDiv = document.getElementById('registrationResults');
+            resultsDiv.innerHTML = '<h3>🚀 Starting Registration Test...</h3>';
+            
+            // Get fresh form data with timestamp
+            const timestamp = Date.now();
+            const formData = new FormData(event.target);
+            const userData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                password: formData.get('password')
+            };
+            
+            // Ensure uniqueness by adding timestamp
+            userData.email = userData.email.replace('999', timestamp.toString().slice(-3));
+            userData.phone = userData.phone.replace('7775', timestamp.toString().slice(-4));
+            
+            resultsDiv.innerHTML += '<div class="info">📝 User Data: ' + JSON.stringify(userData, null, 2) + '</div>';
+            console.log('🔍 Fresh User Data:', userData);
+            
+            // Test 1: Direct API call
+            resultsDiv.innerHTML += '<h4>Test 1: Direct API Call</h4>';
+            try {
+                const response = await fetch('http://localhost:5003/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                
+                resultsDiv.innerHTML += '<div class="info">📊 Response Status: ' + response.status + '</div>';
+                resultsDiv.innerHTML += '<div class="info">📊 Response Data: ' + JSON.stringify(result, null, 2) + '</div>';
+                
+                if (result.success) {
+                    resultsDiv.innerHTML += '<div class="success">✅ Direct API Registration SUCCESS!</div>';
+                } else {
+                    resultsDiv.innerHTML += '<div class="error">❌ Direct API Registration FAILED: ' + result.message + '</div>';
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML += '<div class="error">❌ Direct API Error: ' + error.message + '</div>';
+            }
+            
+            // Test 2: Using API Client
+            resultsDiv.innerHTML += '<h4>Test 2: Using API Client</h4>';
+            try {
+                if (window.api && api.signup) {
+                    resultsDiv.innerHTML += '<div class="info">✅ API Client Available</div>';
+                    
+                    const result = await api.signup(userData);
+                    resultsDiv.innerHTML += '<div class="info">📊 API Client Result: ' + JSON.stringify(result, null, 2) + '</div>';
+                    
+                    if (result.success) {
+                        resultsDiv.innerHTML += '<div class="success">✅ API Client Registration SUCCESS!</div>';
+                    } else {
+                        resultsDiv.innerHTML += '<div class="error">❌ API Client Registration FAILED: ' + result.message + '</div>';
+                    }
+                } else {
+                    resultsDiv.innerHTML += '<div class="error">❌ API Client NOT Available</div>';
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML += '<div class="error">❌ API Client Error: ' + error.message + '</div>';
+            }
+            
+            // Test 3: Using Auth System
+            resultsDiv.innerHTML += '<h4>Test 3: Using Auth System</h4>';
+            try {
+                resultsDiv.innerHTML += '<div class="info">🔍 Testing authInstance.register()...</div>';
+                
+                const result = await authInstance.register(userData);
+                resultsDiv.innerHTML += '<div class="info">📊 Auth Result: ' + JSON.stringify(result, null, 2) + '</div>';
+                
+                if (result.success) {
+                    resultsDiv.innerHTML += '<div class="success">✅ Auth Registration SUCCESS!</div>';
+                } else {
+                    resultsDiv.innerHTML += '<div class="error">❌ Auth Registration FAILED: ' + result.message + '</div>';
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML += '<div class="error">❌ Auth System Error: ' + error.message + '</div>';
+            }
+            
+            // Check MongoDB after registration
+            setTimeout(checkMongoUsers, 2000);
+        }
+        
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debugInfo');
+            
+            let html = '<h3>🔍 Debug Information:</h3>';
+            html += '<p><strong>window.api:</strong> ' + (window.api ? 'Available ✅' : 'Not available ❌') + '</p>';
+            html += '<p><strong>ApiClient:</strong> ' + (typeof ApiClient !== 'undefined' ? 'Available ✅' : 'Not available ❌') + '</p>';
+            html += '<p><strong>Auth:</strong> ' + (typeof Auth !== 'undefined' ? 'Available ✅' : 'Not available ❌') + '</p>';
+            html += '<p><strong>Current URL:</strong> ' + window.location.href + '</p>';
+            html += '<p><strong>User Agent:</strong> ' + navigator.userAgent + '</p>';
+            
+            if (window.api) {
+                html += '<p><strong>API Base URL:</strong> ' + api.baseURL + '</p>';
+                html += '<p><strong>API User Base URL:</strong> ' + api.userBaseURL + '</p>';
+            }
+            
+            if (authInstance) {
+                html += '<p><strong>Current User:</strong> ' + (authInstance.getCurrentUser() ? authInstance.getCurrentUser().name : 'None') + '</p>';
+                html += '<p><strong>Users in localStorage:</strong> ' + (authInstance.users ? authInstance.users.length : 0) + '</p>';
+            }
+            
+            debugDiv.innerHTML = html;
+        }
+        
+        async function checkMongoUsers() {
+            const mongoDiv = document.getElementById('mongoUsers');
+            mongoDiv.innerHTML = '<p>Loading MongoDB users...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5003/api/users');
+                const result = await response.json();
+                
+                if (result.success) {
+                    let html = '<h3>🗄️ ' + result.count + ' Users in MongoDB:</h3>';
+                    result.users.forEach(function(user, index) {
+                        html += '<div class="info">';
+                        html += '<strong>' + (index + 1) + '. ' + user.name + '</strong><br>';
+                        html += 'Email: ' + user.email + '<br>';
+                        html += 'Phone: ' + user.phone + '<br>';
+                        html += 'Created: ' + new Date(user.createdAt).toLocaleString() + '<br>';
+                        html += 'Welcome Email: ' + (user.welcomeEmailSent ? 'Sent ✅' : 'Not sent ❌') + '</div>';
+                    });
+                    mongoDiv.innerHTML = html;
+                } else {
+                    mongoDiv.innerHTML = '<div class="error">❌ Failed to fetch users</div>';
+                }
+            } catch (error) {
+                mongoDiv.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+        
+        // Initialize on load
+        window.onload = function() {
+            showDebugInfo();
+            window.testAPIConnection();
+            window.checkMongoUsers();
+        };
+    </script>
+</body>
+</html>

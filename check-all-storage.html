@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check All User Storage</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .user { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        .storage-type { font-weight: bold; color: #333; }
+        .clear-btn { background: #e74c3c; color: white; padding: 10px; border: none; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Check All User Storage Locations</h1>
+    
+    <div class="section">
+        <h2 class="storage-type">📱 Local Storage (Browser)</h2>
+        <div id="localStorage"></div>
+        <button class="clear-btn" onclick="clearLocalStorage()">Clear Local Storage</button>
+    </div>
+    
+    <div class="section">
+        <h2 class="storage-type">🗄️ Session Storage (Browser)</h2>
+        <div id="sessionStorage"></div>
+        <button class="clear-btn" onclick="clearSessionStorage()">Clear Session Storage</button>
+    </div>
+    
+    <div class="section">
+        <h2 class="storage-type">🍪 Cookies</h2>
+        <div id="cookies"></div>
+        <button class="clear-btn" onclick="clearCookies()">Clear Cookies</button>
+    </div>
+    
+    <div class="section">
+        <h2 class="storage-type">🗄️ MongoDB Users (via API)</h2>
+        <div id="mongoUsers">
+            <button class="clear-btn" onclick="fetchMongoUsers()">Fetch MongoDB Users</button>
+        </div>
+    </div>
+
+    <script>
+        function displayStorage() {
+            // Local Storage
+            const localStorageDiv = document.getElementById('localStorage');
+            let localStorageHTML = '';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                if (key.includes('user') || key.includes('krazygirls')) {
+                    localStorageHTML += '<div class="user"><strong>' + key + ':</strong> ' + value + '</div>';
+                }
+            }
+            localStorageDiv.innerHTML = localStorageHTML || '<p>No user-related data found</p>';
+            
+            // Session Storage
+            const sessionStorageDiv = document.getElementById('sessionStorage');
+            let sessionStorageHTML = '';
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                const value = sessionStorage.getItem(key);
+                if (key.includes('user') || key.includes('krazygirls')) {
+                    sessionStorageHTML += '<div class="user"><strong>' + key + ':</strong> ' + value + '</div>';
+                }
+            }
+            sessionStorageDiv.innerHTML = sessionStorageHTML || '<p>No user-related data found</p>';
+            
+            // Cookies
+            const cookiesDiv = document.getElementById('cookies');
+            const cookies = document.cookie.split(';');
+            let cookieHTML = '';
+            cookies.forEach(function(cookie) {
+                const parts = cookie.trim().split('=');
+                const name = parts[0];
+                const value = parts[1];
+                if (name.includes('user') || name.includes('krazygirls')) {
+                    cookieHTML += '<div class="user"><strong>' + name + ':</strong> ' + value + '</div>';
+                }
+            });
+            cookiesDiv.innerHTML = cookieHTML || '<p>No user-related cookies found</p>';
+        }
+        
+        async function fetchMongoUsers() {
+            const mongoDiv = document.getElementById('mongoUsers');
+            try {
+                const response = await fetch('http://localhost:5003/api/users');
+                const result = await response.json();
+                
+                if (result.success) {
+                    let html = '<h3>📊 ' + result.count + ' Users Found in MongoDB:</h3>';
+                    result.users.forEach(function(user, index) {
+                        html += '<div class="user">';
+                        html += '<strong>' + (index + 1) + '. ' + user.name + '</strong><br>';
+                        html += 'Email: ' + user.email + '<br>';
+                        html += 'Phone: ' + user.phone + '<br>';
+                        html += 'Created: ' + new Date(user.createdAt).toLocaleString() + '<br>';
+                        html += 'Welcome Email Sent: ' + (user.welcomeEmailSent || 'Not set') + '<br>';
+                        html += 'ID: ' + user._id;
+                        html += '</div>';
+                    });
+                    mongoDiv.innerHTML = html;
+                } else {
+                    mongoDiv.innerHTML = '<p>❌ Failed to fetch users from MongoDB</p>';
+                }
+            } catch (error) {
+                mongoDiv.innerHTML = '<p>❌ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        function clearLocalStorage() {
+            localStorage.clear();
+            displayStorage();
+        }
+        
+        function clearSessionStorage() {
+            sessionStorage.clear();
+            displayStorage();
+        }
+        
+        function clearCookies() {
+            const cookies = document.cookie.split(';');
+            cookies.forEach(function(cookie) {
+                document.cookie = cookie.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/');
+            });
+            displayStorage();
+        }
+        
+        // Display on load
+        displayStorage();
+    </script>
+</body>
+</html>
