@@ -1,5 +1,9 @@
 {
   "version": 2,
+  "buildCommand": "echo 'Static site ready'",
+  "outputDirectory": "public",
+  "installCommand": "echo 'No install needed'",
+  "framework": "other",
   "builds": [
     {
       "src": "index.html",
