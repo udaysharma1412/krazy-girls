@@ -1,24 +1,15 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/*.js",
-      "use": "@vercel/node"
-    }
+    {"src": "index.html", "use": "@vercel/static"},
+    {"src": "api/*.js", "use": "@vercel/node"},
+    {"src": "*.css", "use": "@vercel/static"},
+    {"src": "*.js", "use": "@vercel/static"},
+    {"src": "images/**", "use": "@vercel/static"}
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    {"src": "/api/(.*)", "dest": "/api/$1"},
+    {"src": "/(.*)", "dest": "/index.html"}
   ],
   "env": {
     "MONGODB_URI": "mongodb+srv://udaysharma1412_db_user:Uu7878282655@cluster0.kvab4cu.mongodb.net/krazy-girls",
