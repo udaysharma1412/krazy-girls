@@ -1,0 +1,3 @@
+Force Netlify cache clear - fix submodule issue
+Deployed at: 2026-01-04 12:38 PM
+Complete submodule removal - fresh build required
