@@ -1,0 +1,8 @@
+MONGODB_URI=mongodb+srv://udaysharma1412_db_user:Uu7878282655@cluster0.kvab4cu.mongodb.net/krazy-girls
+JWT_SECRET=krazy-girls-jwt-secret-2024-secure-key
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=krazygirls2024@gmail.com
+EMAIL_PASS=your-gmail-app-password
+JWT_EXPIRE=30d
+PORT=5001

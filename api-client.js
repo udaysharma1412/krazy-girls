@@ -4,7 +4,7 @@
 class ApiClient {
   constructor() {
     // Use Vercel API URLs in production, localhost in development
-    this.isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    this.isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:';
     
     if (this.isProduction) {
       this.baseURL = 'https://krazy-girls.vercel.app/api';
@@ -106,8 +106,8 @@ class ApiClient {
 
   // Authentication
   async login(email, password) {
-    console.log('🔍 Login Debug: endpoint before modification =', endpoint);
-    const data = await this.request(`${this.userBaseURL}/login`, {
+    console.log('🔍 Login Debug: endpoint before modification = /auth/login');
+    const data = await this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
@@ -120,11 +120,11 @@ class ApiClient {
   }
 
   async signup(userData) {
-    console.log('🔍 Signup Debug: endpoint before modification = /signup');
+    console.log('🔍 Signup Debug: endpoint before modification = /auth/signup');
     console.log('🔍 Signup Debug: userData =', userData);
     console.log('🔍 Signup Debug: JSON.stringify(userData) =', JSON.stringify(userData));
     
-    const data = await this.request('/signup', {
+    const data = await this.request('/auth/signup', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
