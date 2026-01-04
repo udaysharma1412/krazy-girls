@@ -3,6 +3,17 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// User Schema
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  phone: String,
+  password: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
@@ -50,14 +61,30 @@ const handler = async (event, context) => {
         };
       }
 
-      // Mock user creation (replace with actual database logic)
-      const user = {
-        _id: Date.now().toString(),
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Email already registered'
+          })
+        };
+      }
+
+      // Create new user
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = new User({
         name,
         email,
         phone,
-        password: await bcrypt.hash(password, 10)
-      };
+        password: hashedPassword
+      });
+
+      await user.save();
+      console.log('User saved to MongoDB:', user._id);
 
       // Generate token
       const token = generateToken(user._id);
@@ -94,14 +121,18 @@ const handler = async (event, context) => {
         };
       }
 
-      // Mock user login (replace with actual database logic)
-      const user = {
-        _id: '123456',
-        name: 'Test User',
-        email: 'test@example.com',
-        phone: '1234567890',
-        password: await bcrypt.hash('password123', 10)
-      };
+      // Find user
+      const user = await User.findOne({ email });
+      if (!user) {
+        return {
+          statusCode: 401,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid credentials'
+          })
+        };
+      }
 
       // Check password
       const isMatch = await bcrypt.compare(password, user.password);
