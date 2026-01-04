@@ -1,9 +1,6 @@
 // Vercel Serverless Function for Products
 const mongoose = require('mongoose');
 
-// Load environment variables
-require('dotenv').config();
-
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
