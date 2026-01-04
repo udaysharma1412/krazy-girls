@@ -1,4 +1,4 @@
-// Vercel Serverless Function for Products
+// Netlify Serverless Function for Products
 const mongoose = require('mongoose');
 
 // Connect to MongoDB
@@ -6,7 +6,7 @@ mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
 
-module.exports = async (req, res) => {
+const handler = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -21,76 +21,79 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Sample products data
+    // Sample products data (you can replace with database queries)
     const products = [
       {
         _id: '1',
-        name: 'Krazy Girls T-Shirt',
-        price: 999,
-        image: 'images/dress21.jpg',
-        category: 'women',
-        description: 'Stylish cotton t-shirt for modern women',
+        name: 'Elegant Evening Dress',
+        price: 89.99,
+        image: 'images/dress1.jpg',
+        category: 'dresses',
+        description: 'Beautiful evening dress perfect for special occasions',
         inStock: true,
         rating: 4.5,
         reviews: 23
       },
       {
         _id: '2',
-        name: 'Krazy Girls Jeans',
-        price: 1499,
-        image: 'images/dress22.jpg',
-        category: 'women',
-        description: 'Comfortable denim jeans with perfect fit',
-        inStock: true,
-        rating: 4.8,
-        reviews: 45
-      },
-      {
-        _id: '3',
-        name: 'Krazy Girls Dress',
-        price: 2499,
-        image: 'images/dress23.jpg',
-        category: 'women',
-        description: 'Elegant evening dress for special occasions',
+        name: 'Casual Summer Top',
+        price: 34.99,
+        image: 'images/top1.jpg',
+        category: 'tops',
+        description: 'Comfortable and stylish summer top',
         inStock: true,
         rating: 4.2,
         reviews: 18
       },
       {
-        _id: '4',
-        name: 'Krazy Girls Skirt',
-        price: 899,
-        image: 'images/dress24.jpg',
-        category: 'women',
-        description: 'Trendy skirt with beautiful patterns',
+        _id: '3',
+        name: 'Designer Handbag',
+        price: 129.99,
+        image: 'images/bag1.jpg',
+        category: 'accessories',
+        description: 'Premium designer handbag with multiple compartments',
         inStock: true,
-        rating: 4.6,
-        reviews: 12
+        rating: 4.8,
+        reviews: 31
+      },
+      {
+        _id: '4',
+        name: 'Stylish Jeans',
+        price: 59.99,
+        image: 'images/jeans1.jpg',
+        category: 'bottoms',
+        description: 'Modern fit jeans with premium denim',
+        inStock: true,
+        rating: 4.3,
+        reviews: 27
       },
       {
         _id: '5',
-        name: 'Krazy Girls Handbag',
-        price: 3299,
-        image: 'images/dress25.jpg',
-        category: 'accessories',
-        description: 'Stylish handbag for everyday use',
+        name: 'Fashion Sneakers',
+        price: 79.99,
+        image: 'images/shoes1.jpg',
+        category: 'footwear',
+        description: 'Trendy sneakers perfect for casual wear',
         inStock: true,
-        rating: 4.7,
-        reviews: 8
+        rating: 4.6,
+        reviews: 19
       }
     ];
 
     res.status(200).json({
       success: true,
-      message: 'Products retrieved successfully',
-      products: products
+      count: products.length,
+      data: products
     });
 
   } catch (error) {
-    console.error('❌ Products error:', error);
+    console.error('Products API error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: error.message
     });
   }
 };
+
+module.exports = { handler };

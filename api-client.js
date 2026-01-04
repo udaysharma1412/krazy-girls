@@ -3,12 +3,12 @@
 
 class ApiClient {
   constructor() {
-    // Use Vercel API URLs in production, localhost in development
+    // Use Netlify API URLs in production, localhost in development
     this.isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:';
     
     if (this.isProduction) {
-      this.baseURL = 'https://krazy-girls.vercel.app/api';
-      this.userBaseURL = 'https://krazy-girls.vercel.app/api';
+      this.baseURL = 'https://your-site-name.netlify/.netlify/functions';
+      this.userBaseURL = 'https://your-site-name.netlify/.netlify/functions';
     } else {
       this.baseURL = 'http://localhost:5003/api';
       this.userBaseURL = 'http://localhost:5003/api';
