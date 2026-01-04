@@ -7,12 +7,18 @@
     {"src": "*.js", "use": "@vercel/static"},
     {"src": "images/*", "use": "@vercel/static"}
   ],
+  
+
+
   "routes": [
     {"src": "/api/(.*)", "dest": "/api/$1"},
     {"src": "/images/(.*)", "dest": "/images/$1"},
     {"src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico))", "dest": "/$1"},
     {"src": "/(.*)", "dest": "/index.html"}
   ],
+
+
+  
   "headers": [
     {
       "source": "/api/(.*)",
