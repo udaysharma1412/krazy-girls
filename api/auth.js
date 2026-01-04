@@ -15,29 +15,39 @@ const generateToken = (id) => {
   });
 };
 
-const handler = async (req, res) => {
+const handler = async (event, context) => {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+  };
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
   }
 
   try {
-    const { pathname } = new URL(req.url, `http://${req.headers.host}`);
+    const path = event.path.replace(/\/\.netlify\/functions\/auth/, '');
     
-    if (req.method === 'POST' && pathname === '/signup') {
+    if (event.httpMethod === 'POST' && path === '/signup') {
       // Handle signup
-      const { name, email, phone, password } = req.body;
+      const { name, email, phone, password } = JSON.parse(event.body);
       
       // Validation
       if (!name || !email || !phone || !password) {
-        return res.status(400).json({
-          success: false,
-          message: 'Please provide all required fields'
-        });
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Please provide all required fields'
+          })
+        };
       }
 
       // Mock user creation (replace with actual database logic)
@@ -52,28 +62,36 @@ const handler = async (req, res) => {
       // Generate token
       const token = generateToken(user._id);
 
-      res.status(201).json({
-        success: true,
-        message: 'User registered successfully',
-        token,
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone
-        }
-      });
+      return {
+        statusCode: 201,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: 'User registered successfully',
+          token,
+          user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone
+          }
+        })
+      };
 
-    } else if (req.method === 'POST' && pathname === '/login') {
+    } else if (event.httpMethod === 'POST' && path === '/login') {
       // Handle login
-      const { email, password } = req.body;
+      const { email, password } = JSON.parse(event.body);
       
       // Validation
       if (!email || !password) {
-        return res.status(400).json({
-          success: false,
-          message: 'Please provide email and password'
-        });
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Please provide email and password'
+          })
+        };
       }
 
       // Mock user login (replace with actual database logic)
@@ -88,41 +106,57 @@ const handler = async (req, res) => {
       // Check password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid credentials'
-        });
+        return {
+          statusCode: 401,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid credentials'
+          })
+        };
       }
 
       // Generate token
       const token = generateToken(user._id);
 
-      res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        token,
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone
-        }
-      });
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: 'Login successful',
+          token,
+          user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone
+          }
+        })
+      };
 
     } else {
-      res.status(404).json({
-        success: false,
-        message: 'Route not found'
-      });
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Route not found'
+        })
+      };
     }
 
   } catch (error) {
     console.error('Auth API error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message
-    });
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      })
+    };
   }
 };
 
