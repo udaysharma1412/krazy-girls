@@ -7,8 +7,9 @@ class ApiClient {
     this.isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:';
     
     if (this.isProduction) {
-      this.baseURL = 'https://your-site-name.netlify/.netlify/functions';
-      this.userBaseURL = 'https://your-site-name.netlify/.netlify/functions';
+      // Use the current site's hostname for API calls
+      this.baseURL = `${window.location.protocol}//${window.location.hostname}/.netlify/functions`;
+      this.userBaseURL = `${window.location.protocol}//${window.location.hostname}/.netlify/functions`;
     } else {
       this.baseURL = 'http://localhost:5003/api';
       this.userBaseURL = 'http://localhost:5003/api';
