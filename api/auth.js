@@ -30,6 +30,12 @@ const generateToken = (id) => {
 // Send Welcome Email
 const sendWelcomeEmail = async (user) => {
   try {
+    console.log('🔧 Email Debug: Starting email send process');
+    console.log('🔧 Email Debug: EMAIL_HOST =', process.env.EMAIL_HOST);
+    console.log('🔧 Email Debug: EMAIL_PORT =', process.env.EMAIL_PORT);
+    console.log('🔧 Email Debug: EMAIL_USER =', process.env.EMAIL_USER);
+    console.log('🔧 Email Debug: EMAIL_PASS exists =', !!process.env.EMAIL_PASS);
+    
     // Create transporter
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -40,6 +46,12 @@ const sendWelcomeEmail = async (user) => {
         pass: process.env.EMAIL_PASS
       }
     });
+
+    console.log('🔧 Email Debug: Transporter created');
+
+    // Verify transporter
+    await transporter.verify();
+    console.log('🔧 Email Debug: Transporter verified successfully');
 
     // Email content
     const mailOptions = {
@@ -112,12 +124,16 @@ const sendWelcomeEmail = async (user) => {
       `
     };
 
+    console.log('🔧 Email Debug: Sending email to:', user.email);
+
     // Send email
     const info = await transporter.sendMail(mailOptions);
-    console.log('Welcome email sent successfully:', info.messageId);
+    console.log('🔧 Email Debug: Email sent successfully:', info.messageId);
+    console.log('🔧 Email Debug: Email preview URL:', nodemailer.getTestMessageUrl(info));
     return true;
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.error('🔧 Email Debug: Error sending welcome email:', error);
+    console.error('🔧 Email Debug: Error details:', error.message);
     return false;
   }
 };
