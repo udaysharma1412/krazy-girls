@@ -1773,12 +1773,18 @@
                             this.products = this.getSampleProducts();
                         } else {
                             // Handle nested response format from backend
-                            if (result.success && result.products) {
-                                this.products = result.products.map(product => ({
+                            if (result.success && result.data) {
+                                this.products = result.data.map(product => ({
                                     ...product,
                                     id: product._id || product.id // Ensure id field exists
                                 }));
                                 console.log('Loaded products from API:', this.products.length, 'products');
+                            } else if (result.success && result.products) {
+                                this.products = result.products.map(product => ({
+                                    ...product,
+                                    id: product._id || product.id // Ensure id field exists
+                                }));
+                                console.log('Loaded products from API (legacy format):', this.products.length, 'products');
                             } else {
                                 this.products = result; // Fallback for direct array
                                 console.log('Loaded products from API (direct):', this.products.length, 'products');
